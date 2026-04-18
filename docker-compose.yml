@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Piston Code Execution Engine
+  piston:
+    image: ghcr.io/engineer-man/piston:latest
+    container_name: piston_api
+    restart: always
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston_data:/piston/packages
+    environment:
+      - PISTON_LOG_LEVEL=INFO
+    networks:
+      - hackathon_network
+
+  # Backend Server
+  server:
+    build: ./server
+    container_name: interactai_server
+    restart: always
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - piston
+    networks:
+      - hackathon_network
+
+  # Frontend Client
+  client:
+    build: ./client
+    container_name: interactai_client
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./client/.env.local
+    depends_on:
+      - server
+    networks:
+      - hackathon_network
+
+volumes:
+  piston_data:
+    driver: local
+
+networks:
+  hackathon_network:
+    driver: bridge

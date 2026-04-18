@@ -1,0 +1,16 @@
+services:
+  piston:
+    image: ghcr.io/engineer-man/piston:latest
+    container_name: piston_api
+    restart: always
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston_data:/piston/packages
+    environment:
+      - PISTON_LOG_LEVEL=INFO
+
+volumes:
+  piston_data:
+    driver: local
